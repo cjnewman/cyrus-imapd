@@ -119,6 +119,7 @@ struct namespace_t namespace_jmap = {
     {
         { NULL,                 NULL },                 /* ACL          */
         { NULL,                 NULL },                 /* BIND         */
+        { NULL,                 NULL },                 /* CONNECT      */
         { NULL,                 NULL },                 /* COPY         */
         { NULL,                 NULL },                 /* DELETE       */
         { &jmap_get,            NULL },                 /* GET          */

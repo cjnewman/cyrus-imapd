@@ -402,6 +402,7 @@ static struct sasl_callback mysasl_cb[] = {
 const struct known_meth_t http_methods[] = {
     { "ACL",            0 },
     { "BIND",           0 },
+    { "CONNECT",        METH_NOBODY },
     { "COPY",           METH_NOBODY },
     { "DELETE",         METH_NOBODY },
     { "GET",            METH_NOBODY },
@@ -433,6 +434,7 @@ struct namespace_t namespace_default = {
     {
         { NULL,                 NULL },                 /* ACL          */
         { NULL,                 NULL },                 /* BIND         */
+        { NULL,                 NULL },                 /* CONNECT      */
         { NULL,                 NULL },                 /* COPY         */
         { NULL,                 NULL },                 /* DELETE       */
         { &meth_get,            NULL },                 /* GET          */
