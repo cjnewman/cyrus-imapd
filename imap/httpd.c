@@ -1721,7 +1721,7 @@ static void cmdloop(struct http_connection *conn)
                 http2_output(&txn);
             }
             else if (txn.ws_ctx) {
-                /* WebSocket output */
+                /* WebSocket over HTTP/1.1 output */
                 ws_output(&txn);
             }
             prot_flush(httpd_out);
@@ -1752,7 +1752,7 @@ static void cmdloop(struct http_connection *conn)
             http2_input(&txn);
         }
         else if (txn.ws_ctx) {
-            /* WebSocket input */
+            /* WebSocket over HTTP/1.1 input */
             ws_input(&txn);
         }
         else {
