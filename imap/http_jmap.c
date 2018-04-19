@@ -90,7 +90,6 @@ static time_t compile_time;
 static json_t *jmap_capabilities = NULL;
 
 /* HTTP method handlers */
-static int jmap_connect(struct transaction_t *txn, void *params);
 static int jmap_get(struct transaction_t *txn, void *params);
 static int jmap_post(struct transaction_t *txn, void *params);
 
@@ -116,6 +115,10 @@ static int myrights_byname(struct auth_state *authstate,
                            const char *mboxname,
                            hash_table *mboxrights);
 
+static struct connect_params ws_params = {
+    JMAP_BASE_URL, JMAP_WS_PROTOCOL, &jmap_ws
+};
+
 /* Namespace for JMAP */
 struct namespace_t namespace_jmap = {
     URL_NS_JMAP, 0, JMAP_ROOT, "/.well-known/jmap",
@@ -126,7 +129,7 @@ struct namespace_t namespace_jmap = {
     {
         { NULL,                 NULL },                 /* ACL          */
         { NULL,                 NULL },                 /* BIND         */
-        { &jmap_connect,        NULL },                 /* CONNECT      */
+        { &meth_connect,        &ws_params },           /* CONNECT      */
         { NULL,                 NULL },                 /* COPY         */
         { NULL,                 NULL },                 /* DELETE       */
         { &jmap_get,            NULL },                 /* GET          */
@@ -422,25 +425,6 @@ static int jmap_auth(const char *userid __attribute__((unused)))
                             httpd_userisadmin || httpd_userisproxyadmin);
     return 0;
 }
-
-static int jmap_connect(struct transaction_t *txn,
-                        void *params __attribute__((unused)))
-{
-    /* Upgrade to WebSockets over HTTP/2 on API endpoint, if requested */
-    if (txn->flags.ver != VER_2) return HTTP_NOT_IMPLEMENTED;
-
-    if (jmap_parse_path(txn) || (txn->req_tgt.flags != JMAP_ENDPOINT_API)) {
-        return HTTP_NOT_ALLOWED;
-    }
-
-    if (!(txn->flags.upgrade & UPGRADE_WS)) {
-        txn->error.desc = "Missing/unsupported :protocol value ";
-        return HTTP_BAD_REQUEST;
-    }
-
-    return ws_start_channel(txn, JMAP_WS_PROTOCOL, &jmap_ws);
-}
-
 
 /* Perform a GET/HEAD request */
 static int jmap_get(struct transaction_t *txn,
